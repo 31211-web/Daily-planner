@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Minimal Planner</title>
+    <style>
+        /* 🎨 馬卡龍色彩與基礎設定 */
+        :root {
+            --milk-tea: #F5EBE0;     /* 生活 */
+            --light-blue: #D8E2DC;   /* 工作 */
+            --light-purple: #E8E8E4; /* 成長 */
+            --light-pink: #FFE5D9;   /* 健康 */
+            --bg-color: #FAFAFA;
+            --text-main: #4A4A4A;
+            --text-light: #A0A0A0;
+        }
+
+        body {
+            font-family: 'PingFang TC', 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+        }
+
+        /* 標題排版 */
+        header.main-header h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        section header h2 {
+            font-size: 1.2rem;
+            margin: 0 0 15px 0;
+            border-bottom: 2px solid #EEE;
+            padding-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        small {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: normal;
+        }
+
+        /* ✨ 控制面板 (新增任務) */
+        .input-panel {
+            background: #FFF;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: 1px solid #EEE;
+            border-radius: 8px;
+            outline: none;
+            color: var(--text-main);
+        }
+
+        select, button {
+            padding: 10px 15px;
+            border: 1px solid #EEE;
+            border-radius: 8px;
+            background: #FFF;
+            color: var(--text-main);
+            cursor: pointer;
+            outline: none;
+        }
+
+        button {
+            background-color: var(--text-main);
+            color: #FFF;
+            font-weight: bold;
+            border: none;
+            transition: 0.2s;
+        }
+        button:hover { background-color: #333; }
+
+        /* 📝 計畫區塊與任務清單 */
+        .plan-section {
+            background: #FFFFFF;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+        }
+
+        article.task {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #F9F9F9;
+            transition: 0.3s;
+        }
+        article.task:last-child { border-bottom: none; }
+
+        article.task input[type="checkbox"] {
+            margin-right: 15px;
+            accent-color: var(--text-light);
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        article.task.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-light);
+        }
+
+        .task-text { flex: 1; }
+
+        /* 🏷️ 標籤設計 */
+        span.tag {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-left: 10px;
+            color: #555;
+            font-weight: 500;
+        }
+        .tag-life { background-color: var(--milk-tea); }
+        .tag-work { background-color: var(--light-blue); }
+        .tag-grow { background-color: var(--light-purple); }
+        .tag-health { background-color: var(--light-pink); }
+
+        button.delete-btn {
+            background: none;
+            border: none;
+            color: #FF9999;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 10px;
+            padding: 0 5px;
+        }
+        button.delete-btn:hover { color: #FF6666; background: none; }
+
+        /* 🗓️ 簡易月曆視圖 */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .day-box {
+            background: var(--bg-color);
+            padding: 10px 5px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .day-box.today {
+            background: var(--light-blue);
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        
+        <header class="main-header">
+            <h1>☁️ My Minimal Planner</h1>
+        </header>
+
+        <section class="input-panel" aria-label="新增任務面板">
+            <input type="text" id="task-input" placeholder="輸入新任務..." required>
+            <select id="type-select">
+                <option value="daily">日計畫 (每日重複)</option>
+                <option value="weekly">週計畫</option>
+                <option value="monthly">月計畫</option>
+            </select>
+            <select id="tag-select">
+                <option value="life">生活 🍵</option>
+                <option value="work">工作 💻</option>
+                <option value="grow">成長 📚</option>
+                <option value="health">健康 🌸</option>
+            </select>
+            <button onclick="addTask()">新增</button>
+        </section>
+
+        <section class="plan-section">
+            <header>
+                <h2>日計畫 Daily <small>(每日自動重置)</small></h2>
+            </header>
+            <div id="daily-list"></div>
+        </section>
+
+        <section class="plan-section">
+            <header>
+                <h2>週計畫 Weekly</h2>
+            </header>
+            <div id="weekly-list"></div>
+        </section>
+
+        <section class="plan-section">
+            <header>
+                <h2>月計畫 Monthly</h2>
+            </header>
+            <div class="calendar-grid" id="calendar"></div>
+            <div id="monthly-list"></div>
+        </section>
+
+    </main>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('plannerTasks')) || [];
+        let lastDate = localStorage.getItem('lastDate') || new Date().toDateString();
+        
+        const today = new Date().toDateString();
+        if (today !== lastDate) {
+            tasks.forEach(task => {
+                if (task.type === 'daily') task.completed = false;
+            });
+            localStorage.setItem('lastDate', today);
+            saveTasks();
+        }
+
+        function renderCalendar() {
+            const calendarEl = document.getElementById('calendar');
+            const date = new Date();
+            const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+            const currentDay = date.getDate();
+            
+            let html = '';
+            for (let i = 1; i <= daysInMonth; i++) {
+                const isToday = i === currentDay ? 'today' : '';
+                html += `<div class="day-box ${isToday}">${i}</div>`;
+            }
+            calendarEl.innerHTML = html;
+        }
+
+        function saveTasks() {
+            localStorage.setItem('plannerTasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function renderTasks() {
+            document.getElementById('daily-list').innerHTML = '';
+            document.getElementById('weekly-list').innerHTML = '';
+            document.getElementById('monthly-list').innerHTML = '';
+
+            tasks.forEach((task, index) => {
+                // HTML5 語意標籤 <article> 代表一筆獨立的內容（任務）
+                const taskEl = document.createElement('article');
+                taskEl.className = `task ${task.completed ? 'completed' : ''}`;
+                
+                const tagNames = { life: '生活', work: '工作', grow: '成長', health: '健康' };
+                
+                taskEl.innerHTML = `
+                    <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="toggleTask(${index})">
+                    <span class="task-text">${task.text}</span>
+                    <span class="tag tag-${task.tag}">${tagNames[task.tag]}</span>
+                    <button class="delete-btn" onclick="deleteTask(${index})" aria-label="刪除任務">✕</button>
+                `;
+
+                document.getElementById(`${task.type}-list`).appendChild(taskEl);
+            });
+        }
+
+        function addTask() {
+            const textInput = document.getElementById('task-input');
+            const text = textInput.value.trim();
+            const type = document.getElementById('type-select').value;
+            const tag = document.getElementById('tag-select').value;
+
+            if (text === '') return alert('請輸入任務內容喔！');
+
+            tasks.push({ text, type, tag, completed: false });
+            textInput.value = '';
+            saveTasks();
+        }
+
+        function toggleTask(index) {
+            tasks[index].completed = !tasks[index].completed;
+            saveTasks();
+        }
+
+        function deleteTask(index) {
+            tasks.splice(index, 1);
+            saveTasks();
+        }
+
+        renderCalendar();
+        renderTasks();
+    </script>
+</body>
+</html>
